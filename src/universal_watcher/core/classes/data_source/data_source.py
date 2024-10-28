@@ -9,11 +9,6 @@ from ..formatter.formatter import Formatter
 
 
 class DataSource(ABC):
-    # @abstractmethod
-    # def possible_params(self) -> list[dict]:
-    #     """Possible parameters of the data source"""
-    #     pass
-
     @abstractmethod
     def params(self) -> DataSourceParameters:
         """Parameters for the data source"""
@@ -30,7 +25,7 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def get_stored_items(self) -> list[DataSourceItem]:
+    def get_stored_items(self, watcher_name: str) -> list[DataSourceItem]:
         """Get the stored items"""
         pass
 

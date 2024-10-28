@@ -32,11 +32,6 @@ class BazosSkDataSource(DataSource):
         self._formatter_service = formatter_service
         self._params: BazosSkParameters
 
-    # def possible_params(self) -> list[dict]:
-    #     """Possible parameters of the data source"""
-    #     # TODO: Could just return the pydantic model fields?
-    #     return self._db_service.get_possible_parameters()
-
     def params(self) -> BazosSkParameters:
         return self._params
 
@@ -60,7 +55,8 @@ class BazosSkDataSource(DataSource):
         return self._formatter_service.get_formatter(formatter_name)
 
     def format_items(
-        self, formatter: Formatter, items: list[BazosSkItem]
+        self, formatter_name: str, items: list[BazosSkItem]
     ) -> NotificationPlatformInput:
         """Format the items to string"""
+        formatter = self.get_formatter(formatter_name)
         return formatter.format_items(items)

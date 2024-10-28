@@ -24,10 +24,6 @@ class EmailNotificationPlatform(NotificationPlatform):
         self._email_service = email_service
         self._params: EmailParameters
 
-    # def possible_params(self) -> list[dict]:
-    #     """Possible parameters of the data source"""
-    #     return self._db_service.get_possible_parameters()
-
     def params(self) -> EmailParameters:
         return self._params
 

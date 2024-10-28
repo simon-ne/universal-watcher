@@ -1,21 +1,17 @@
 from abc import ABC, abstractmethod
 
 from .notification_platform_input import NotificationPlatformInput
+from .notification_platform_parameters import NotificationPlatformParameters
 
 
 class NotificationPlatform(ABC):
-    # @abstractmethod
-    # def possible_params(self):
-    #     """Possible parameters of the notification platform"""
-    #     pass
-
     @abstractmethod
-    def params(self):
+    def params(self) -> NotificationPlatformParameters:
         """Parameters for the data source"""
         pass
 
     @abstractmethod
-    def set_params(self):
+    def set_params(self, params: dict) -> None:
         """Setup the data source parameters"""
         pass
 
