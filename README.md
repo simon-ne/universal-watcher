@@ -1,327 +1,166 @@
 # Universal Watcher
 
-**Universal Watcher** is a versatile and extensible Python package designed to monitor data sources and send notifications through various platforms. With a modular architecture and dependency injection, it allows seamless integration of new data sources and notification methods, making it ideal for a wide range of applications such as monitoring websites, APIs, or any data streams and notifying users via email, SMS, or other channels.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
+
+**Universal Watcher** is a versatile and extendable Python package designed to monitor various data sources and notify users about new data through multiple notification platforms. Easily add support for new data sources and notification methods without modifying the core package.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Architecture](#architecture)
 - [Installation](#installation)
-- [Configuration](#configuration)
 - [Usage](#usage)
-- [Adding New Data Sources](#adding-new-data-sources)
-- [Adding New Notification Platforms](#adding-new-notification-platforms)
-- [Dependency Injection](#dependency-injection)
-- [Database](#database)
-- [Error Handling](#error-handling)
+  - [Creating a Watcher](#creating-a-watcher)
+  - [Checking Watchers](#checking-watchers)
+- [Extending Universal Watcher](#extending-universal-watcher)
+  - [Adding a New Data Source](#adding-a-new-data-source)
+  - [Adding a New Formatter](#adding-a-new-formatter)
+  - [Adding a New Notification Platform](#adding-a-new-notification-platform)
+- [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
 
 ## Features
 
-- **Modular Data Sources**: Easily add or remove data sources to monitor.
-- **Flexible Notification Platforms**: Send notifications via email, SMS, or any other custom platform.
-- **Dependency Injection**: Simplifies managing dependencies and enhances testability.
-- **Persistent Storage**: Uses TinyDB for lightweight data storage.
-- **Configurable Parameters**: Customize data source and notification parameters through configuration files.
-- **Template-Based Formatting**: Utilize Jinja2 templates for crafting notification messages.
-- **Singleton Services**: Ensures single instances of critical services for consistent behavior.
-
-## Architecture
-
-Universal Watcher follows a modular architecture with clear separations between data sources, notification platforms, services, and core functionalities. Here's an overview of the primary components:
-
-- **Data Sources**: Implemented as subclasses of the `DataSource` abstract base class. Each data source fetches and processes data from a specific source.
-- **Notification Platforms**: Implemented as subclasses of the `NotificationPlatform` abstract base class. Each platform handles sending notifications through different channels.
-- **Services**: Singleton services manage registries for data sources and notification platforms, handle database interactions, and provide utility functions.
-- **Dependency Injection**: Managed through a custom `DependencyInjector` decorator to handle dependencies and prevent circular references.
+- **Extendable Data Sources**: Add custom data sources with multiple formatters.
+- **Multiple Notification Platforms**: Integrate various notification methods like email, SMS, and more.
+- **Dependency Injection**: Simplified management of dependencies using a custom injector.
+- **Thread-Safe Database Operations**: Reliable storage with TinyDB.
+- **Environment Variable Configuration**: Securely manage sensitive information.
 
 ## Installation
 
-### Prerequisites
+Install via pip:
 
-- Python 3.8 or higher
-- `pip` package manager
-
-### Steps
-
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/yourusername/universal-watcher.git
-   cd universal-watcher
-   ```
-
-2. **Create a Virtual Environment**
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Configuration
-
-### Environment Variables
-
-Set up the necessary environment variables for email notifications. Create a `.env` file or set them directly in your environment:
-
-```env
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_ENCRYPTION=STARTTLS
-SMTP_USERNAME=your_username
-SMTP_PASSWORD=your_password
-SMTP_SENDER_EMAIL=sender@example.com
+```bash
+pip install universal_watcher
 ```
 
-### Database
+Or install from source:
 
-Universal Watcher uses TinyDB for data storage. The default database file is located at `package/core/db.json`. Ensure the application has read/write permissions to this file.
+```bash
+git clone https://github.com/simon-ne/universal-watcher.git
+cd universal-watcher
+pip install .
+```
 
 ## Usage
 
-### Setting Up Watchers
+Universal Watcher provides methods to create new watchers, check existing watchers for new data, and check all watchers at once.
 
-1. **Register Data Sources and Notification Platforms**
+### Creating a Watcher
 
-   The `core/setup.py` script registers available data sources and notification platforms. Ensure this script is executed when initializing the watcher.
+To create a new watcher, define the data source and notification platform parameters and register the watcher in the database. This setup allows you to monitor specific data sources and receive notifications through your chosen platforms.
 
-2. **Initialize the Watcher**
+### Checking Watchers
 
-   ```python
-   import core.setup  # Registers data sources and notification platforms
-   from core.watchers import Watcher
+- **Check a Specific Watcher**: Looks for new data and notifies the user if any new items are found.
 
-   watcher = Watcher()
-   ```
+  ```python
+  from universal_watcher import Watcher
 
-3. **Configure Watcher Parameters**
+  watcher = Watcher()
+  watcher.check("watcher_name")
+  ```
 
-   Configure your watcher by setting up data source parameters and notification platform parameters in the database (`db.json`).
+- **Check All Watchers**: Iterates through all registered watchers, checking for new data and sending notifications as needed.
 
-4. **Run Checks**
+  ```python
+  watcher.check_all()
+  ```
 
-   ```python
-   watcher.check("watcher_name")
-   ```
+## Extending Universal Watcher
 
-### Example
+Universal Watcher is designed to be easily extensible. You can add new data sources, formatters, and notification platforms without altering the core package.
 
-```python
-from core.watchers import Watcher
+### Adding a New Data Source
 
-# Initialize watcher
-watcher = Watcher()
+1. **Create the Data Source Class**: Inherit from `DataSource` and implement the required abstract methods.
 
-# Check a specific watcher by name
-watcher.check("bazos_sk_watcher")
+2. **Add Formatters**: Each data source can have multiple formatters. Create formatter classes inheriting from `Formatter`.
+
+3. **Register the Data Source**: Place your data source in the `data_sources` package and ensure it's discoverable via the `setup.py` script.
+
+**Example Structure:**
+
+```
+universal_watcher/
+  data_sources/
+    your_data_source/
+      __init__.py
+      your_data_source.py
+      formatters/
+        your_formatter.py
+      models/
+        your_item.py
+      services/
+        your_service.py
 ```
 
-## Adding New Data Sources
+### Adding a New Formatter
 
-To add a new data source:
+1. **Create Formatter Class**: Inherit from `Formatter` and implement the `format_items` method.
 
-1. **Create a Data Source Class**
-
-   Subclass the `DataSource` abstract base class and implement all abstract methods.
-
-   ```python
-   from core.classes.data_source.data_source import DataSource
-   from core.decorators.injector import DependencyInjector as Injector
-
-   @Injector.inject_as_singleton
-   @Injector.inject_dependencies
-   class NewDataSource(DataSource):
-       def __init__(self, *, data_service, db_service, formatter_service):
-           # Initialize dependencies
-           pass
-
-       def params(self):
-           # Return parameters
-           pass
-
-       def set_params(self, params: dict):
-           # Set parameters
-           pass
-
-       def fetch_items(self):
-           # Fetch new items
-           pass
-
-       def get_stored_items(self):
-           # Get stored items
-           pass
-
-       def get_formatter(self, formatter_name: str):
-           # Return formatter
-           pass
-
-       def format_items(self, formatter_name: str, items: list):
-           # Format items
-           pass
-   ```
-
-2. **Register the Data Source**
-
-   In `core/setup.py`, register your new data source:
-
-   ```python
-   from data_sources.new_source.new_data_source import NewDataSource
-   from data_sources.new_source.config import NEW_DATA_SOURCE_NAME
-
-   data_sources_registry.register_data_source(
-       NEW_DATA_SOURCE_NAME, NewDataSource
-   )
-   ```
-
-3. **Define Parameters and Models**
-
-   Create necessary parameter and item models using Pydantic.
-
-4. **Implement Services**
-
-   If your data source requires additional services (e.g., API clients), implement and inject them as needed.
-
-## Adding New Notification Platforms
-
-To add a new notification platform:
-
-1. **Create a Notification Platform Class**
-
-   Subclass the `NotificationPlatform` abstract base class and implement all abstract methods.
-
-   ```python
-   from core.classes.notification_platform.notification_platform import NotificationPlatform
-   from core.decorators.injector import DependencyInjector as Injector
-
-   @Injector.inject_as_singleton
-   @Injector.inject_dependencies
-   class NewNotificationPlatform(NotificationPlatform):
-       def __init__(self, *, notification_service):
-           # Initialize dependencies
-           pass
-
-       def params(self):
-           # Return parameters
-           pass
-
-       def set_params(self, params: dict):
-           # Set parameters
-           pass
-
-       def notify(self, input_data):
-           # Send notification
-           pass
-   ```
-
-2. **Register the Notification Platform**
-
-   In `core/setup.py`, register your new notification platform:
-
-   ```python
-   from notification_platforms.new_platform.new_notification_platform import NewNotificationPlatform
-   from notification_platforms.new_platform.config import NEW_NOTIFICATION_PLATFORM_NAME
-
-   notification_platforms_registry.register_notification_platform(
-       NEW_NOTIFICATION_PLATFORM_NAME, NewNotificationPlatform
-   )
-   ```
-
-3. **Define Parameters and Models**
-
-   Create necessary parameter and input models using Pydantic.
-
-4. **Implement Services**
-
-   Implement any required services (e.g., API clients) and inject them as needed.
-
-## Dependency Injection
-
-Universal Watcher utilizes a custom `DependencyInjector` for managing dependencies, promoting loose coupling and enhancing testability.
-
-### How It Works
-
-- **Singletons**: Classes can be marked as singletons using the `@inject_as_singleton` decorator, ensuring only one instance exists.
-- **Dependency Injection**: Use the `@inject_dependencies` decorator on classes to automatically inject required dependencies based on type hints.
-- **Circular Dependency Prevention**: The injector detects and prevents circular dependencies, raising a `CircularDependencyError` if detected.
-
-### Example
+2. **Register Formatter**: Add the formatter to the data source's `config.py` under the `FORMATTERS` dictionary.
 
 ```python
-from core.decorators.injector import DependencyInjector as Injector
+# your_formatter.py
+from universal_watcher.core.classes.formatter.formatter import Formatter
 
-@Injector.inject_as_singleton
-@Injector.inject_dependencies
-class ExampleService:
-    def __init__(self, *, dependency: AnotherService):
-        self.dependency = dependency
+class YourFormatter(Formatter):
+    def format_items(self, items):
+        # Implement formatting logic
+        pass
 ```
 
-## Database
+```python
+# config.py
+from .your_formatter import YourFormatter
 
-Universal Watcher uses **TinyDB** for lightweight JSON-based data storage.
+FORMATTERS = {
+    'your_formatter': YourFormatter
+}
+```
 
-### Tables
+### Adding a New Notification Platform
 
-- **watchers**: Stores watcher configurations.
-- **watcher_data**: Stores fetched items for each watcher.
-- **data_sources**: Stores registered data sources.
-- **notification_platforms**: Stores registered notification platforms.
+1. **Create Notification Platform Class**: Inherit from `NotificationPlatform` and implement the required methods.
 
-### CoreDbService
+2. **Register the Notification Platform**: Place your platform in the `notification_platforms` package and ensure it's discoverable via the `setup.py` script.
 
-Provides methods to interact with the database, such as fetching and storing watcher data.
+**Example Structure:**
 
-## Error Handling
+```
+universal_watcher/
+  notification_platforms/
+    your_platform/
+      __init__.py
+      your_platform.py
+      models/
+        your_input.py
+      services/
+        your_service.py
+```
 
-Universal Watcher includes robust error handling to manage potential issues:
+## Configuration
 
-- **CircularDependencyError**: Raised when a circular dependency is detected during dependency injection.
-- **ValueError**: Raised for invalid configurations, missing parameters, or failed operations.
-- **Exception Handling**: Catch and handle exceptions during data fetching or notification sending to ensure reliability.
+Use environment variables to manage sensitive configurations such as SMTP credentials. This ensures that sensitive information is not hard-coded and can be easily managed across different environments.
+
+**Example Environment Variables for Email Notification Platform:**
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_ENCRYPTION`
+- `SMTP_USERNAME`
+- `SMTP_PASSWORD`
+- `SMTP_SENDER_EMAIL`
+
+You can set these variables in your environment or use a `.env` file. Ensure that your environment variables are loaded before running the application.
 
 ## Contributing
 
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-
-   ```bash
-   git checkout -b feature/new-feature
-   ```
-
-3. **Commit Your Changes**
-
-   ```bash
-   git commit -m "Add new feature"
-   ```
-
-4. **Push to the Branch**
-
-   ```bash
-   git push origin feature/new-feature
-   ```
-
-5. **Open a Pull Request**
-
-Please ensure your code adheres to the project's coding standards and includes appropriate tests.
+Contributions are welcome! Please open issues or submit pull requests for enhancements or bug fixes. Ensure that your code follows the project's coding standards and includes appropriate tests.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For questions, issues, or feature requests, please open an issue on the [GitHub repository](https://github.com/simon-ne/universal-watcher).
-
----
-
-**Happy Watching!** 🚀
