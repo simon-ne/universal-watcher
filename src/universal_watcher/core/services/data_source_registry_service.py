@@ -28,7 +28,7 @@ class DataSourcesRegistryService:
         """
         return self._data_sources
 
-    def _get_data_source_data(self, name: str) -> Union[dict, None]:
+    def _get_data_source_entry(self, name: str) -> Union[dict, None]:
         """
         Retrieves data for a specific data source by name.
 
@@ -57,7 +57,7 @@ class DataSourcesRegistryService:
         Raises:
             ValueError: If a data source with the given name already exists.
         """
-        if self._get_data_source_data(name):
+        if self._get_data_source_entry(name):
             raise ValueError(
                 f"A data source with the name '{name}' already exists."
             )
@@ -77,7 +77,7 @@ class DataSourcesRegistryService:
         Raises:
             ValueError: If the data source with the given name is not found.
         """
-        data = self._get_data_source_data(name)
+        data = self._get_data_source_entry(name)
 
         if not data:
             raise ValueError(f"Data source {name} not found.")

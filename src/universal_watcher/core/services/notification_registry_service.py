@@ -30,7 +30,7 @@ class NotificationRegistryService:
         """
         return self._notification_platforms
 
-    def _get_notification_platform_data(self, name: str) -> Union[dict, None]:
+    def _get_notification_platform_entry(self, name: str) -> Union[dict, None]:
         """
         Retrieves data for a specific notification platform by name.
 
@@ -58,7 +58,7 @@ class NotificationRegistryService:
         Raises:
             ValueError: If a notification platform with the given name already exists.
         """
-        if self._get_notification_platform_data(name):
+        if self._get_notification_platform_entry(name):
             raise ValueError(
                 f"A notification platform with the name '{name}' already exists."
             )
@@ -78,7 +78,7 @@ class NotificationRegistryService:
         Raises:
             ValueError: If the notification platform with the given name is not found.
         """
-        data = self._get_notification_platform_data(name)
+        data = self._get_notification_platform_entry(name)
 
         if not data:
             raise ValueError(f"Notification platform '{name}' not found.")
