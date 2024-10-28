@@ -17,6 +17,9 @@
   - [Adding a New Formatter](#adding-a-new-formatter)
   - [Adding a New Notification Platform](#adding-a-new-notification-platform)
 - [Configuration](#configuration)
+- [Development](#development)
+  - [Running Tests](#running-tests)
+  - [Building and Publishing](#building-and-publishing)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -27,6 +30,7 @@
 - **Dependency Injection**: Simplified management of dependencies using a custom injector.
 - **Thread-Safe Database Operations**: Reliable storage with TinyDB.
 - **Environment Variable Configuration**: Securely manage sensitive information.
+- **Automated Releases**: CI/CD pipeline to build and publish packages to PyPI.
 
 ## Installation
 
@@ -52,15 +56,39 @@ Universal Watcher provides methods to create new watchers, check existing watche
 
 To create a new watcher, define the data source and notification platform parameters and register the watcher in the database. This setup allows you to monitor specific data sources and receive notifications through your chosen platforms.
 
+```python
+from universal_watcher import Watcher
+
+watcher = Watcher()
+watcher.create(
+    watcher_name="my_watcher",
+    data_source_data={
+        "name": "bazos_sk",
+        "formatter": "email_formatter",
+        "parameters": {
+            "category": "auto",
+            "location": "12345",
+            "search": "sedan",
+            "min_price": 5000,
+            "max_price": 20000,
+            "radius": 50
+        }
+    },
+    notification_platform_data={
+        "name": "email",
+        "parameters": {
+            "to": "recipient@example.com"
+        }
+    }
+)
+```
+
 ### Checking Watchers
 
 - **Check a Specific Watcher**: Looks for new data and notifies the user if any new items are found.
 
   ```python
-  from universal_watcher import Watcher
-
-  watcher = Watcher()
-  watcher.check("watcher_name")
+  watcher.check("my_watcher")
   ```
 
 - **Check All Watchers**: Iterates through all registered watchers, checking for new data and sending notifications as needed.
