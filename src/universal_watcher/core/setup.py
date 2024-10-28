@@ -1,3 +1,4 @@
+from typing import Type, Union
 import pkgutil
 import importlib
 
@@ -13,7 +14,21 @@ from universal_watcher.core.services.notification_registry_service import (
 )
 
 
-def discover_and_register(package, base_class, registry, name_attr="NAME"):
+def discover_and_register(
+    package: str,
+    base_class: Type,
+    registry: Union[DataSourcesRegistryService, NotificationRegistryService],
+    name_attr: str = "NAME",
+) -> None:
+    """
+    Discovers subclasses within a package and registers them to the specified registry.
+
+    Args:
+        package (str): The package name to search for modules.
+        base_class (type): The base class to filter subclasses.
+        registry (DataSourcesRegistryService or NotificationRegistryService): The registry service to register the discovered classes.
+        name_attr (str, optional): The attribute to use as the registration name. Defaults to "NAME".
+    """
     package = importlib.import_module(package)
     for finder, name, ispkg in pkgutil.walk_packages(
         package.__path__, prefix=package.__name__ + "."
@@ -27,7 +42,6 @@ def discover_and_register(package, base_class, registry, name_attr="NAME"):
                 and cls is not base_class
             ):
                 cls_name = getattr(cls, name_attr, cls.__name__.lower())
-                print(f"Registering {cls_name}")
                 if isinstance(registry, DataSourcesRegistryService):
                     registry.register_data_source(name=cls_name, cls_type=cls)
                 elif isinstance(registry, NotificationRegistryService):
