@@ -159,7 +159,7 @@ You can set these variables in your environment or use a `.env` file. Ensure tha
 
 ## Contributing
 
-Contributions are welcome! Please open issues or submit pull requests for enhancements or bug fixes. Ensure that your code follows the project's coding standards and includes appropriate tests.
+Contributions are welcome! Please open issues or submit pull requests for enhancements or bug fixes.
 
 ## License
 
