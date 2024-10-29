@@ -17,13 +17,12 @@
   - [Adding a New Formatter](#adding-a-new-formatter)
   - [Adding a New Notification Platform](#adding-a-new-notification-platform)
 - [Configuration](#configuration)
-- [Development](#development)
-  - [Running Tests](#running-tests)
-  - [Building and Publishing](#building-and-publishing)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
+
+<a id="features"></a>
 
 - **Extendable Data Sources**: Add custom data sources with multiple formatters.
 - **Multiple Notification Platforms**: Integrate various notification methods like email, SMS, and more.
@@ -33,6 +32,8 @@
 - **Automated Releases**: CI/CD pipeline to build and publish packages to PyPI.
 
 ## Installation
+
+<a id="installation"></a>
 
 Install via pip:
 
@@ -50,9 +51,13 @@ pip install .
 
 ## Usage
 
+<a id="usage"></a>
+
 Universal Watcher provides methods to create new watchers, check existing watchers for new data, and check all watchers at once.
 
 ### Creating a Watcher
+
+<a id="creating-a-watcher"></a>
 
 To create a new watcher, define the data source and notification platform parameters and register the watcher in the database. This setup allows you to monitor specific data sources and receive notifications through your chosen platforms.
 
@@ -85,6 +90,8 @@ watcher.create(
 
 ### Checking Watchers
 
+<a id="checking-watchers"></a>
+
 - **Check a Specific Watcher**: Looks for new data and notifies the user if any new items are found.
 
   ```python
@@ -99,9 +106,13 @@ watcher.create(
 
 ## Extending Universal Watcher
 
+<a id="extending-universal-watcher"></a>
+
 Universal Watcher is designed to be easily extensible. You can add new data sources, formatters, and notification platforms without altering the core package.
 
 ### Adding a New Data Source
+
+<a id="adding-a-new-data-source"></a>
 
 1. **Create the Data Source Class**: Inherit from `DataSource` and implement the required abstract methods.
 
@@ -126,6 +137,8 @@ universal_watcher/
 ```
 
 ### Adding a New Formatter
+
+<a id="adding-a-new-formatter"></a>
 
 1. **Create Formatter Class**: Inherit from `Formatter` and implement the `format_items` method.
 
@@ -152,6 +165,8 @@ FORMATTERS = {
 
 ### Adding a New Notification Platform
 
+<a id="adding-a-new-notification-platform"></a>
+
 1. **Create Notification Platform Class**: Inherit from `NotificationPlatform` and implement the required methods.
 
 2. **Register the Notification Platform**: Place your platform in the `notification_platforms` package and ensure it's discoverable via the `setup.py` script.
@@ -172,6 +187,8 @@ universal_watcher/
 
 ## Configuration
 
+<a id="configuration"></a>
+
 Use environment variables to manage sensitive configurations such as SMTP credentials. This ensures that sensitive information is not hard-coded and can be easily managed across different environments.
 
 **Example Environment Variables for Email Notification Platform:**
@@ -187,8 +204,12 @@ You can set these variables in your environment or use a `.env` file. Ensure tha
 
 ## Contributing
 
+<a id="contributing"></a>
+
 Contributions are welcome! Please open issues or submit pull requests for enhancements or bug fixes.
 
 ## License
+
+<a id="license"></a>
 
 This project is licensed under the [MIT License](LICENSE).
