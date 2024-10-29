@@ -11,6 +11,7 @@
 - [Usage](#usage)
   - [Creating a Watcher](#creating-a-watcher)
   - [Checking Watchers](#checking-watchers)
+  - [Using a Custom Formatter](#using-a-custom-formatter)
 - [Extending Universal Watcher](#extending-universal-watcher)
   - [Adding a New Data Source](#adding-a-new-data-source)
   - [Adding a New Formatter](#adding-a-new-formatter)
