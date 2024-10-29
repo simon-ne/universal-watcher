@@ -7,7 +7,6 @@
 
 ## Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating a Watcher](#creating-a-watcher)
@@ -19,17 +18,6 @@
 - [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
-
-## Features
-
-<a id="features"></a>
-
-- **Extendable Data Sources**: Add custom data sources with multiple formatters.
-- **Multiple Notification Platforms**: Integrate various notification methods like email, SMS, and more.
-- **Dependency Injection**: Simplified management of dependencies using a custom injector.
-- **Thread-Safe Database Operations**: Reliable storage with TinyDB.
-- **Environment Variable Configuration**: Securely manage sensitive information.
-- **Automated Releases**: CI/CD pipeline to build and publish packages to PyPI.
 
 ## Installation
 
@@ -102,6 +90,44 @@ watcher.create(
 
   ```python
   watcher.check_all()
+  ```
+
+### Using a Custom Formatter
+
+<a id="using-a-custom-formatter"></a>
+
+- **Create a custom formatter**: Inherit from `Formatter` class, implement `format_items` method.
+
+  ```python
+  # your_formatter.py
+  from universal_watcher.core.classes.formatter.formatter import Formatter
+  from universal_watcher.core.classes.data_source.data_source_item import (
+      DataSourceItem,
+  )
+  from universal_watcher.core.classes.notification_platform.notification_platform_input import (
+      NotificationPlatformInput,
+  )
+
+
+  class YourCustomFormatter(Formatter):
+      def format_items(
+          self, items: list[DataSourceItem]
+      ) -> NotificationPlatformInput:
+          # Implement formatting logic
+          pass
+  ```
+
+- **Use the custom formatter**: Instead of using `watcher.check()` method, do the following.
+
+  ```python
+  # main.py
+  from universal_watcher import Watcher
+  from your_formatter import YourCustomFormatter
+
+  watcher = Watcher()
+  new_items = watcher.get_new_data(watcher_name)
+  notif_input = YourCustomFormatter().format_items(new_items)
+  watcher.send_notification(watcher_name, notif_input)
   ```
 
 ## Extending Universal Watcher
