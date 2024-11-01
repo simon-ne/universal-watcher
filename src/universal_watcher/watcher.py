@@ -1,7 +1,3 @@
-from universal_watcher.core import (
-    setup,
-)  # Registers data sources and notification platforms
-
 from universal_watcher.core.decorators.injector import (
     DependencyInjector as Injector,
 )
