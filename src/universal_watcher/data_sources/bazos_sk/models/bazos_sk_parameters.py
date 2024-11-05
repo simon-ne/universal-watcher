@@ -37,36 +37,39 @@ class CategoryEnum(str, Enum):
 class BazosSkParameters(BaseModel, DataSourceParameters):
     category: Optional[CategoryEnum] = Field(
         CategoryEnum.NONE,
-        description="Kategória inzerátov na vyhľadávanie.",
         json_schema_extra={"uri_param_name": "rub"},
-    )
-    location: Optional[str] = Field(
-        "",
-        description="Mesto alebo obec, kde sa má vyhľadávať. (PSČ)",
-        json_schema_extra={"uri_param_name": "hlokalita"},
     )
     search: Optional[str] = Field(
         "",
-        description="Text na vyhľadávanie.",
+        examples=["iPhone 12"],
         json_schema_extra={"uri_param_name": "hledat"},
+    )
+    location: Optional[str] = Field(
+        "",
+        title="Location (ZIP)",
+        examples=["12345"],
+        json_schema_extra={"uri_param_name": "hlokalita"},
+    )
+    radius: Optional[int] = Field(
+        25,
+        title="Radius (km)",
+        ge=0,
+        examples=[25],
+        json_schema_extra={"uri_param_name": "humkreis"},
     )
     min_price: Optional[int] = Field(
         0,
+        title="Min price (eur)",
         ge=0,
-        description="Cena od (eur)",
+        examples=[100],
         json_schema_extra={"uri_param_name": "cenaod"},
     )
     max_price: Optional[int] = Field(
         0,
+        title="Max price (eur)",
         ge=0,
-        description="Cena do (eur)",
+        examples=[500],
         json_schema_extra={"uri_param_name": "cenado"},
-    )
-    radius: Optional[int] = Field(
-        25,
-        ge=0,
-        description="Vzdialenosť od lokality (km)",
-        json_schema_extra={"uri_param_name": "humkreis"},
     )
 
     @field_validator("location")
