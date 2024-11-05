@@ -102,3 +102,23 @@ class DataSourcesRegistryService:
                 return data_source["name"]
 
         raise ValueError(f"Data source {cls_type} not found.")
+
+    def get_data_source_class(self, name: str) -> Type[DataSource]:
+        """
+        Retrieves the class of a data source given its name.
+
+        Args:
+            name (str): The name of the data source.
+
+        Raises:
+            ValueError: If no data source with the given name is found.
+
+        Returns:
+            Type[DataSource]: The class of the data source.
+        """
+        data = self._get_data_source_entry(name)
+
+        if not data:
+            raise ValueError(f"Data source {name} not found.")
+
+        return data["class"]
