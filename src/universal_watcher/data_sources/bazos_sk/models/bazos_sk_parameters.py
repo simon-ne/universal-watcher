@@ -74,6 +74,9 @@ class BazosSkParameters(BaseModel, DataSourceParameters):
 
     @field_validator("location")
     def validate_location(cls, value):
+        if not value:
+            return value
+
         if not value.isdigit() or len(value) != 5:
             raise ValueError(
                 "Location must be in the form of a 5 digit number (12345)."
