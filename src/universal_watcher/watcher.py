@@ -53,7 +53,7 @@ class Watcher:
             ValueError: If the watcher already exists.
         """
         data_source_name = data_source_data["name"]
-        data_source_class = self._data_sources_service.get_data_source(
+        data_source_class = self._data_sources_service.get_data_source_class(
             data_source_name
         )
 

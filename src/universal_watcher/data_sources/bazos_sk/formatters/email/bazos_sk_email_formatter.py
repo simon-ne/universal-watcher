@@ -33,7 +33,7 @@ class BazosSkEmailFormatter(Formatter):
 
     def format_items(self, items: list[BazosSkItem]) -> EmailInput:
         return EmailInput(
-            subject="Nové inzeráty na Bazos.sk",
+            subject="New listings on Bazos.sk",
             body=self.template.render(
                 items=items, current_year=self.current_time().year
             ),
