@@ -12,6 +12,10 @@ from universal_watcher.core.decorators.injector import (
     DependencyInjector as Injector,
 )
 from universal_watcher.core.models.watcher_model import WatcherModel
+from universal_watcher.core.models.watcher_model import (
+    WatcherDataSourceModel,
+    WatcherNotificationPlatformModel,
+)
 
 
 class DbTable(str, Enum):
@@ -111,6 +115,47 @@ class CoreDbService:
 
         return watcher_data[0]
 
+    def set_watcher_data(
+        self,
+        watcher_name: str,
+        data_source: WatcherDataSourceModel,
+        notification_platform: WatcherNotificationPlatformModel,
+    ) -> None:
+        """
+        Sets the data source and notification platform for a specified watcher.
+
+        This method updates the data source and notification platform for a watcher
+        identified by `watcher_name`. If the watcher does not exist or if there are
+        multiple watchers with the same name, it raises a ValueError.
+
+        Args:
+            watcher_name (str): The name of the watcher to update.
+            data_source (WatcherDataSourceModel): The data source model to set for the watcher.
+            notification_platform (WatcherNotificationPlatformModel): The notification platform model to set for the watcher.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+            ValueError: If there are multiple watchers with the same name.
+        """
+        if not self.does_watcher_exist(watcher_name):
+            raise ValueError(f"Watcher {watcher_name} not found.")
+
+        if not self.is_watcher_unique(watcher_name):
+            raise ValueError(
+                "Watchers must have unique names.",
+                f"Found multiple watchers named {watcher_name}.",
+            )
+
+        with self._lock:
+            self._db.table(DbTable.WATCHERS).upsert(
+                {
+                    "name": watcher_name,
+                    "data_source": data_source.model_dump(),
+                    "notification_platform": notification_platform.model_dump(),
+                },
+                Query().name == watcher_name,
+            )
+
     def get_watcher_items(self, watcher_name: str) -> List[Document]:
         """
         Get items associated with a specific watcher.
@@ -180,3 +225,38 @@ class CoreDbService:
 
         with self._lock:
             self._db.table(DbTable.WATCHERS).insert(watcher_data.model_dump())
+
+    def get_all_watchers_data(self) -> List[Document]:
+        """
+        Get the data of all watchers stored in the database.
+
+        Returns:
+            List[Document]: List of watcher data documents.
+        """
+        with self._lock:
+            watchers = self._db.table(DbTable.WATCHERS).all()
+
+        return watchers
+
+    def get_watcher_data_by_id(self, watcher_id: int) -> Document:
+        """
+        Retrieve watcher data by watcher id.
+
+        Args:
+            watcher_id (int): The id of the watcher.
+
+        Returns:
+            Document: The watcher data document.
+
+        Raises:
+            ValueError: If watcher is not found.
+        """
+        with self._lock:
+            watcher_data = self._db.table(DbTable.WATCHERS).get(
+                doc_id=watcher_id
+            )
+
+        if not watcher_data:
+            raise ValueError(f"Watcher with id {watcher_id} not found.")
+
+        return watcher_data
