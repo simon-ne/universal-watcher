@@ -142,7 +142,7 @@ class CoreDbService:
         if not self.does_watcher_exist(current_watcher_name):
             raise ValueError(f"Watcher {current_watcher_name} not found.")
 
-        if not self.does_watcher_exist(new_watcher_name):
+        if new_watcher_name != current_watcher_name and self.does_watcher_exist(new_watcher_name):
             raise ValueError("Watchers must have unique names.")
 
         with self._lock:
