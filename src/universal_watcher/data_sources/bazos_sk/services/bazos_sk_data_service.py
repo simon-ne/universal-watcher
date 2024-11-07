@@ -63,11 +63,12 @@ class BazosSkDataService:
         root = ET.fromstring(content)
         items = []
         for item in root.findall(".//item"):
-            title = item.find("title").text
+            title_parts = item.find("title").text.strip().split(":")
+            title = ":".join(title_parts[:-1])
             url = item.find("link").text
             description = item.find("description").text
             pub_date = item.find("pubDate").text
-            price_str = title.split(":")[-1].strip()
+            price_str = title_parts[-1].strip()
 
             # Remove the image tag from the description
             if description.startswith("<img"):
