@@ -117,7 +117,8 @@ class CoreDbService:
 
     def set_watcher_data(
         self,
-        watcher_name: str,
+        current_watcher_name: str,
+        new_watcher_name: str,
         data_source: WatcherDataSourceModel,
         notification_platform: WatcherNotificationPlatformModel,
     ) -> None:
@@ -129,31 +130,29 @@ class CoreDbService:
         multiple watchers with the same name, it raises a ValueError.
 
         Args:
-            watcher_name (str): The name of the watcher to update.
+            current_watcher_name (str): The name of the watcher to update.
+            new_watcher_name (str): The new name for the watcher.
             data_source (WatcherDataSourceModel): The data source model to set for the watcher.
             notification_platform (WatcherNotificationPlatformModel): The notification platform model to set for the watcher.
 
         Raises:
             ValueError: If the watcher does not exist.
-            ValueError: If there are multiple watchers with the same name.
+            ValueError: If a watcher with the new name already exists.
         """
-        if not self.does_watcher_exist(watcher_name):
-            raise ValueError(f"Watcher {watcher_name} not found.")
+        if not self.does_watcher_exist(current_watcher_name):
+            raise ValueError(f"Watcher {current_watcher_name} not found.")
 
-        if not self.is_watcher_unique(watcher_name):
-            raise ValueError(
-                "Watchers must have unique names.",
-                f"Found multiple watchers named {watcher_name}.",
-            )
+        if not self.does_watcher_exist(new_watcher_name):
+            raise ValueError("Watchers must have unique names.")
 
         with self._lock:
             self._db.table(DbTable.WATCHERS).upsert(
                 {
-                    "name": watcher_name,
+                    "name": new_watcher_name,
                     "data_source": data_source.model_dump(),
                     "notification_platform": notification_platform.model_dump(),
                 },
-                Query().name == watcher_name,
+                Query().name == current_watcher_name,
             )
 
     def get_watcher_items(self, watcher_name: str) -> List[Document]:

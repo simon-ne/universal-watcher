@@ -88,15 +88,18 @@ class Watcher:
 
     def update(
         self,
-        watcher_name: str,
+        current_watcher_name: str,
+        new_watcher_name: str,
         data_source_data: dict,
         notification_platform_data: dict,
     ) -> None:
         """
-        Update the data source and notification platform for the specified watcher.
+        Update the name od the watcher, data source and notification platform
+        for the specified watcher.
 
         Args:
-            watcher_name (str): The name of the watcher.
+            current_watcher_name (str): The name of the watcher to update.
+            new_watcher_name (str): The new name for the watcher.
             data_source_data (dict): Configuration data for the data source.
             notification_platform_data (dict): Configuration data for the notification platform.
 
@@ -128,7 +131,8 @@ class Watcher:
         )
 
         self._db_service.set_watcher_data(
-            watcher_name,
+            current_watcher_name,
+            new_watcher_name,
             data_source=WatcherDataSourceModel(**data_source_data),
             notification_platform=WatcherNotificationPlatformModel(
                 **notification_platform_data
