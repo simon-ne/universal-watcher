@@ -58,14 +58,14 @@ class BazosSkParameters(BaseModel, DataSourceParameters):
         json_schema_extra={"uri_param_name": "humkreis"},
     )
     min_price: Optional[int] = Field(
-        0,
+        None,
         title="Min price (eur)",
         ge=0,
         examples=[100],
         json_schema_extra={"uri_param_name": "cenaod"},
     )
     max_price: Optional[int] = Field(
-        0,
+        None,
         title="Max price (eur)",
         ge=0,
         examples=[500],
