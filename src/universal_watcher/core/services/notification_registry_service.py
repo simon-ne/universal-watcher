@@ -1,4 +1,6 @@
 from typing import Type, Union
+from pydantic import BaseModel
+import importlib
 
 from ..classes.notification_platform.notification_platform import (
     NotificationPlatform,
@@ -105,3 +107,31 @@ class NotificationRegistryService:
                 return platform["name"]
 
         raise ValueError(f"Notification platform {cls_type} not found.")
+
+    def get_notification_platform_parameters_class(self, name: str) -> Type[BaseModel]:
+        """
+        Retrieves the parameters class of a notification platform by name.
+
+        Args:
+            name (str): The name of the notification platform.
+
+        Returns:
+            Type: The class of the notification platform parameters.
+        """
+        data = self._get_notification_platform_entry(name)
+
+        if not data:
+            raise ValueError(f"Notification platform {name} not found.")
+
+        try:
+            module_path = f"universal_watcher.notification_platforms.{name}.models.{name}_parameters"
+            module = importlib.import_module(module_path)
+
+            class_name = (
+                "".join(word.capitalize() for word in name.split("_"))
+                + "Parameters"
+            )
+
+            return getattr(module, class_name)
+        except (ModuleNotFoundError, AttributeError) as e:
+            raise ValueError(f"Invalid notification platform or class name: {e}")

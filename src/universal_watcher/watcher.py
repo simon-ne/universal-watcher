@@ -1,10 +1,10 @@
 from universal_watcher.core.decorators.injector import (
     DependencyInjector as Injector,
 )
+from universal_watcher.core.services.db_service import CoreDbService
 from universal_watcher.core.services.data_source_registry_service import (
     DataSourcesRegistryService,
 )
-from universal_watcher.core.services.db_service import CoreDbService
 from universal_watcher.core.services.notification_registry_service import (
     NotificationRegistryService,
 )
@@ -52,15 +52,29 @@ class Watcher:
         Raises:
             ValueError: If the watcher already exists.
         """
+        # Validate the data source parameters
         data_source_name = data_source_data["name"]
         data_source_class = (
             self._data_sources_service.get_data_source_parameters_class(
                 data_source_name
             )
         )
+        data_source_parameters = data_source_class(
+            **data_source_data["parameters"]
+        )
+        data_source_data["parameters"] = data_source_parameters.model_dump()
 
-        # Validate the data source parameters
-        data_source_class(**data_source_data["parameters"])
+        # Validate the notification platform parameters
+        notification_platform_name = notification_platform_data["name"]
+        notification_platform_class = self._notifications_service.get_notification_platform_parameters_class(
+            notification_platform_name
+        )
+        notification_platform_parameters = notification_platform_class(
+            **notification_platform_data["parameters"]
+        )
+        notification_platform_data["parameters"] = (
+            notification_platform_parameters.model_dump()
+        )
 
         self._db_service.create_watcher(
             WatcherModel(
@@ -70,6 +84,55 @@ class Watcher:
                     **notification_platform_data
                 ),
             )
+        )
+
+    def update(
+        self,
+        watcher_name: str,
+        data_source_data: dict,
+        notification_platform_data: dict,
+    ) -> None:
+        """
+        Update the data source and notification platform for the specified watcher.
+
+        Args:
+            watcher_name (str): The name of the watcher.
+            data_source_data (dict): Configuration data for the data source.
+            notification_platform_data (dict): Configuration data for the notification platform.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+        """
+        # Validate the data source parameters
+        data_source_name = data_source_data["name"]
+        data_source_class = (
+            self._data_sources_service.get_data_source_parameters_class(
+                data_source_name
+            )
+        )
+        data_source_parameters = data_source_class(
+            **data_source_data["parameters"]
+        )
+        data_source_data["parameters"] = data_source_parameters.model_dump()
+
+        # Validate the notification platform parameters
+        notification_platform_name = notification_platform_data["name"]
+        notification_platform_class = self._notifications_service.get_notification_platform_parameters_class(
+            notification_platform_name
+        )
+        notification_platform_parameters = notification_platform_class(
+            **notification_platform_data["parameters"]
+        )
+        notification_platform_data["parameters"] = (
+            notification_platform_parameters.model_dump()
+        )
+
+        self._db_service.set_watcher_data(
+            watcher_name,
+            data_source=WatcherDataSourceModel(**data_source_data),
+            notification_platform=WatcherNotificationPlatformModel(
+                **notification_platform_data
+            ),
         )
 
     def get_new_data(
