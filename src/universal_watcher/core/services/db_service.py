@@ -1,6 +1,6 @@
 from tinydb import TinyDB, Query
 from tinydb.table import Document
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 from pydantic import BaseModel
 from json import loads
@@ -86,7 +86,7 @@ class CoreDbService:
 
         return [watcher["name"] for watcher in watchers]
 
-    def get_watcher_data(self, watcher_name: str) -> Document:
+    def get_watcher_data(self, watcher_name: str) -> Optional[Document]:
         """
         Retrieve watcher data by watcher name.
 
@@ -94,13 +94,13 @@ class CoreDbService:
             watcher_name (str): The name of the watcher.
 
         Returns:
-            Document: The watcher data document.
+            Document: The watcher data document or None if not found.
 
         Raises:
-            ValueError: If watcher is not found or names are not unique.
+            ValueError: If watcher name is not unique.
         """
         if not self.does_watcher_exist(watcher_name):
-            raise ValueError(f"Watcher {watcher_name} not found.")
+            return None
 
         if not self.is_watcher_unique(watcher_name):
             raise ValueError(
@@ -142,7 +142,10 @@ class CoreDbService:
         if not self.does_watcher_exist(current_watcher_name):
             raise ValueError(f"Watcher {current_watcher_name} not found.")
 
-        if new_watcher_name != current_watcher_name and self.does_watcher_exist(new_watcher_name):
+        if (
+            new_watcher_name != current_watcher_name
+            and self.does_watcher_exist(new_watcher_name)
+        ):
             raise ValueError("Watchers must have unique names.")
 
         with self._lock:
@@ -161,6 +164,10 @@ class CoreDbService:
 
         Args:
             watcher_name (str): The name of the watcher.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+            ValueError: If the watcher name is not unique.
 
         Returns:
             List[Document]: List of watcher items.
@@ -190,6 +197,10 @@ class CoreDbService:
         Args:
             watcher_name (str): Name of the watcher.
             data (List[BaseModel]): List of Pydantic model objects to store.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+            ValueError: If the watcher name is not unique.
         """
         if not self.does_watcher_exist(watcher_name):
             raise ValueError(f"Watcher {watcher_name} not found.")
@@ -237,7 +248,7 @@ class CoreDbService:
 
         return watchers
 
-    def get_watcher_data_by_id(self, watcher_id: int) -> Document:
+    def get_watcher_data_by_id(self, watcher_id: int) -> Optional[Document]:
         """
         Retrieve watcher data by watcher id.
 
@@ -245,10 +256,7 @@ class CoreDbService:
             watcher_id (int): The id of the watcher.
 
         Returns:
-            Document: The watcher data document.
-
-        Raises:
-            ValueError: If watcher is not found.
+            Document: The watcher data document or None if not found.
         """
         with self._lock:
             watcher_data = self._db.table(DbTable.WATCHERS).get(
@@ -256,10 +264,10 @@ class CoreDbService:
             )
 
         if not watcher_data:
-            raise ValueError(f"Watcher with id {watcher_id} not found.")
+            return None
 
         return watcher_data
-    
+
     def delete_watcher(self, watcher_name: str) -> None:
         """
         Delete a watcher from the database.
@@ -274,5 +282,9 @@ class CoreDbService:
             raise ValueError(f"Watcher {watcher_name} not found.")
 
         with self._lock:
-            self._db.table(DbTable.WATCHERS).remove(Query().name == watcher_name)
-            self._db.table(DbTable.WATCHER_DATA).remove(Query().name == watcher_name)
+            self._db.table(DbTable.WATCHERS).remove(
+                Query().name == watcher_name
+            )
+            self._db.table(DbTable.WATCHER_DATA).remove(
+                Query().name == watcher_name
+            )
