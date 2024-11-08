@@ -259,3 +259,20 @@ class CoreDbService:
             raise ValueError(f"Watcher with id {watcher_id} not found.")
 
         return watcher_data
+    
+    def delete_watcher(self, watcher_name: str) -> None:
+        """
+        Delete a watcher from the database.
+
+        Args:
+            watcher_name (str): The name of the watcher to delete.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+        """
+        if not self.does_watcher_exist(watcher_name):
+            raise ValueError(f"Watcher {watcher_name} not found.")
+
+        with self._lock:
+            self._db.table(DbTable.WATCHERS).remove(Query().name == watcher_name)
+            self._db.table(DbTable.WATCHER_DATA).remove(Query().name == watcher_name)

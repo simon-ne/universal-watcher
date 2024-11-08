@@ -250,3 +250,15 @@ class Watcher:
         watchers_names = self._db_service.get_all_watchers()
         for watcher_name in watchers_names:
             self.check(watcher_name)
+
+    def delete(self, watcher_name: str) -> None:
+        """
+        Delete the specified watcher.
+
+        Args:
+            watcher_name (str): The name of the watcher.
+
+        Raises:
+            ValueError: If the watcher does not exist.
+        """
+        self._db_service.delete_watcher(watcher_name)
