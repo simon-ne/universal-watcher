@@ -40,13 +40,19 @@ class BazosSkDataService:
         for i, (param_name, param_value) in enumerate(
             params.model_dump().items()
         ):
-            param_val = urllib.parse.quote(str(param_value))
-            url_param_name = uri_param_names[param_name]
+            if not param_value:
+                continue
+
+            url_param_value = urllib.parse.quote(str(param_value))
+            url_param_name = uri_param_names[param_name]            
+
+            if url_param_name == "rub":
+                url_param_value = url_param_value[:2]
 
             if i != 0:
                 uri += "&"
 
-            uri += f"{url_param_name}={param_val}"
+            uri += f"{url_param_name}={url_param_value}"
 
         return f"{BASE_URL}?{uri}"
 
