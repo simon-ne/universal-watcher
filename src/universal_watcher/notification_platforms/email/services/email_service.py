@@ -56,8 +56,15 @@ class EmailService:
 
         msg.attach(MIMEText(message, content_type))
 
-        smtp = self._open_smtp()
-        errors = smtp.send_message(msg)
+        try:
+            smtp = self._open_smtp()
+            errors = smtp.send_message(msg)
+        except Exception as e:
+            self._smtp = None
+            smtp = self._open_smtp()
+            errors = smtp.send_message(msg)
+        
         if errors:
             raise ValueError(f"Failed to send email: {errors}")
-        smtp.close()
+        
+        smtp.quit()
