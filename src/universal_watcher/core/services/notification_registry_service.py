@@ -115,6 +115,9 @@ class NotificationRegistryService:
         Args:
             name (str): The name of the notification platform.
 
+        Raises:
+            ValueError: If the notification platform with the given name is not found.
+
         Returns:
             Type: The class of the notification platform parameters.
         """

@@ -112,6 +112,9 @@ class DataSourcesRegistryService:
         Args:
             name (str): The name of the data source.
 
+        Raises:
+            ValueError: If the data source with the given name is not found.
+
         Returns:
             Type: The class of the data source parameters.
         """
