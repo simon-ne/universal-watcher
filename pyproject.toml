@@ -7,7 +7,7 @@ packages = ["src/universal_watcher"]
 
 [project]
 name = "universal_watcher"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
     "pydantic>=2.0",
     "tinydb>=4.7.0",
