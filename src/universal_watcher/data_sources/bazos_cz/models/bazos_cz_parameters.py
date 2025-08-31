@@ -59,14 +59,14 @@ class BazosCzParameters(BaseModel, DataSourceParameters):
     )
     min_price: Optional[int] = Field(
         None,
-        title="Min price (eur)",
+        title="Min price (czk)",
         ge=0,
         examples=[100],
         json_schema_extra={"uri_param_name": "cenaod"},
     )
     max_price: Optional[int] = Field(
         None,
-        title="Max price (eur)",
+        title="Max price (czk)",
         ge=0,
         examples=[500],
         json_schema_extra={"uri_param_name": "cenado"},
